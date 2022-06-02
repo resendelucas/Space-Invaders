@@ -1,4 +1,4 @@
-from menucopy import Menu
+from menu import Menu
 from game import Game
 from alien import Alien
 from player import Player
