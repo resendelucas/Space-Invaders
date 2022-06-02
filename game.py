@@ -1,0 +1,79 @@
+from PPlayTeste.window import *
+from PPlayTeste.gameimage import *
+from PPlayTeste.sound import *
+from alien import Alien
+from player import Player
+from random import randint
+from rank import Rank
+
+class Game:
+    player_name = ''
+    def __init__(self):
+        self.screen = Window(600,600)
+        self.playing = False
+        self.game_over, self.leave_game = False, False
+        self.difficulty = 1
+        self.score = 0
+        self.player_life = 3
+        self.player = Player(self)
+        self.alien = Alien(self, self.player)
+        self.keyboard = self.screen.get_keyboard()
+        self.background = GameImage("botao/space.jpg")
+        self.game_over_screen = GameImage("graphic/gameOver.jpg")
+        self.game_over_screen.x, self.game_over_screen.y = self.screen.width/2 - self.game_over_screen.width/2, self.screen.height/2 - self.game_over_screen.height/2
+        self.game_song = Sound("sounds/invaders-song2.wav")
+        self.sound_list = [Sound("sounds/ai.ogg"),Sound("sounds/ui.ogg"),Sound("sounds/tome.ogg"),
+        Sound("sounds/chega.ogg"),Sound("sounds/tapa.ogg"),Sound("sounds/tudo.ogg")]
+        for sound in self.sound_list:
+            sound.decrease_volume(40)
+    def check_events(self):
+
+        for lin in range(len(Alien.alien_list)):
+            for alien in Alien.alien_list[lin]:
+                if alien.y >= self.screen.height:
+                    self.game_over = True
+                if len(Player.fire_list) >= 1:
+                    for shot in Player.fire_list:
+                        if shot.collided(alien):
+                            Alien.alien_list[lin].remove(alien)
+                            Player.fire_list.remove(shot)
+                            self.fire_random()
+                            if lin == 0: self.score += 300
+                            if 1 <= lin <= 2: self.score += 200
+                            if lin == 3: self.score += 100
+            
+        if self.player_life == 0 or self.keyboard.key_pressed('g'):
+            self.game_over = True
+
+    def fire_random(self):
+        self.sound_list[randint(0,len(self.sound_list)-1)].play()
+
+    def play_music(self):
+        if not self.game_song.is_playing():
+            self.game_song.set_repeat(True)
+            self.game_song.play()
+
+    def stop_music(self):
+        if self.game_song.is_playing():
+            self.game_song.stop()
+    
+
+    def write(self):
+        a = self.keyboard.show_key_pressed()
+        if a != None and a != 27 and a != 13:
+            if a == 8:
+                Game.player_name = Game.player_name[:len(Game.player_name)-1]
+            else:
+                try:
+                    Game.player_name += chr(a)
+                except ValueError:
+                    print("invalido")
+        if self.keyboard.key_pressed("ENTER"):
+                Rank(self, self.player_name, self.score).update_rank()
+                self.leave_game = True
+
+    def reset(self):
+        self.player_life = 3
+        self.score = 0
+        self.game_over,self.leave_game = False, False
+        Game.player_name = ''
