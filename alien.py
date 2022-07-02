@@ -1,23 +1,22 @@
 from PPlayTeste.gameimage import *
 from PPlayTeste.sound import *
-from random import choice
+from random import choice, randint
 
 lins = 4
 col = 9
 class Alien():
     alien_list = [[0 for _ in range(col)] for _ in range(lins)]
     alien_fire = []
+    
     def __init__(self,game,player):
         self.game = game
         self.player = player
+        self.cooldown, self.ready = 2, 0
+        self.vLaser = 100
         self.vAlien = 50
         self.direction = 1
-        self.cooldown = 2
-        self.vLaser = 100
-        self.ready = 0
-        self.new_round = False
         self.hit_sound = Sound("sounds/calma.ogg")
-        self.hit_sound.decrease_volume(40)
+        self.hit_sound.decrease_volume(10)
         self.get_aliens()
         
     def get_aliens(self):
@@ -36,22 +35,28 @@ class Alien():
             change_y += 50
 
     def check_alien(self):
-        for lin in range(len(Alien.alien_list)):
-            for alien in Alien.alien_list[lin]:
-                alien.x += self.vAlien * self.game.difficulty * self.game.screen.delta_time()
+        for lin in Alien.alien_list:
+            for alien in lin:
+                alien.x += (self.vAlien + self.game.add_vel) * self.game.difficulty * self.game.screen.delta_time() * self.direction
+
                 if alien.x >= self.game.screen.width - alien.width:
                     alien.x = self.game.screen.width - alien.width - 1
                     self.move_down()
-                    self.vAlien *= -1
+                    self.direction *= -1
+
                 if alien.x <= 0:
                     alien.x = 1
                     self.move_down()
-                    self.vAlien *= -1
+                    self.direction *= -1
+                    
                 if alien.y >= self.game.screen.height:
                     self.game.gameover = True
                     
         if Alien.alien_list == [[],[],[],[]]:
+            self.game.new_round += 1
+            self.game.add_vel = 0
             Alien.alien_list = [[0 for _ in range(col)] for _ in range(lins)]
+            self.game.difficulty += 0.1
             self.get_aliens()
 
     def shoot(self):
@@ -79,10 +84,12 @@ class Alien():
         if Alien.alien_fire != []:
             for alien_shot in Alien.alien_fire:
                 if alien_shot.collided(self.player.spaceship):
-                    self.hit_sound.play()
-                    self.game.player_life -= 1
                     Alien.alien_fire.pop(0)
-
+                    if not self.player.shield:
+                        self.hit_sound.play()
+                        self.game.player_life -= 1
+                        self.player.spaceship.x, self.player.spaceship.y = 300 - self.player.spaceship.width/2, 600 - self.player.spaceship.height
+                        self.player.shield = True
     def draw_aliens(self):
         for lin in range(len(Alien.alien_list)):
             for alien in Alien.alien_list[lin]:
@@ -96,4 +103,5 @@ class Alien():
     def reset(self):
         Alien.alien_list = [[0 for _ in range(col)] for _ in range(lins)]
         Alien.alien_fire = []
+        
         Alien(self.game, self.player)

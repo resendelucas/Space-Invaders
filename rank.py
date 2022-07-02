@@ -7,11 +7,9 @@ class Rank():
     def update_rank(self):
         if self.score != 0:
             with open("ranking.txt",'r+',encoding = 'utf-8') as f:
-                # f.write(f"{self.name}#{self.score}\n")
                 content = f.read()
                 if content == '':
                     f.write(f"{self.name}#{self.score}")
-                    print("aqui")
                 else:
                     f.write(f"{self.name}#{self.score}")
                     f.write('\n')

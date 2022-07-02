@@ -117,4 +117,3 @@ class Menu:
                 self.game.difficulty = 2
             if self.mouse.is_over_object(self.buttons_list[6]):
                 self.game.difficulty = 3
-        # print(self.game.difficulty)

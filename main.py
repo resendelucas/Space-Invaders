@@ -17,11 +17,11 @@ while True:
         game.screen.set_background_color((100,100,100))
     menu.check_events()
     menu.draw_buttons()
-    # game.check_events()
     if game.playing:
         game.screen.set_background_color((100,100,100))
         game.screen.draw_text((f"Score: {game.score}"), 10, -10, size=18, color=(255,255,255), font_name="font/Pixeled.ttf")
-        game.screen.draw_text((f"Life: {game.player_life}"), 500, -10, size=18, color=(255,255,255), font_name="font/Pixeled.ttf")
+        game.screen.draw_text((f"Lives: {game.player_life}"), 450, -10, size=18, color=(255,255,255), font_name="font/Pixeled.ttf")
+        game.show_fps()
         
         if not game.game_over:
             player.check_events()
@@ -30,8 +30,15 @@ while True:
             game.check_events()
             player.draw_laser()
         alien.draw_aliens()
-        player.spaceship.draw()
 
+        if not player.shield:
+            player.spaceship.set_curr_frame(3)
+            player.spaceship.draw()
+        else:
+            player.spaceship.set_total_duration(500)
+            player.spaceship.draw()
+            player.spaceship.update()
+        
         if game.game_over:
             game.game_over_screen.draw()
             game.screen.draw_text((f"NOME: "), 200,250, size=18, color=(255,255,255), font_name="font/Pixeled.ttf")

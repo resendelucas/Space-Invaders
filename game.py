@@ -14,7 +14,13 @@ class Game:
         self.game_over, self.leave_game = False, False
         self.difficulty = 1
         self.score = 0
+        self.add_vel, self.new_round = 0, 0
         self.player_life = 3
+        self.tempo, self.game_loop = 0, 0
+        self.last_fps = 0
+        self.max_alien_x, self.max_alien_y = 0, 0
+        self.min_alien_x, self.min_alien_y = 0, 0
+        self.colidiu = False
         self.player = Player(self)
         self.alien = Alien(self, self.player)
         self.keyboard = self.screen.get_keyboard()
@@ -25,24 +31,28 @@ class Game:
         self.sound_list = [Sound("sounds/ai.ogg"),Sound("sounds/ui.ogg"),Sound("sounds/tome.ogg"),
         Sound("sounds/chega.ogg"),Sound("sounds/tapa.ogg"),Sound("sounds/tudo.ogg")]
         for sound in self.sound_list:
-            sound.decrease_volume(40)
-    def check_events(self):
+            sound.decrease_volume(10)
 
-        for lin in range(len(Alien.alien_list)):
-            for alien in Alien.alien_list[lin]:
-                if alien.y >= self.screen.height:
-                    self.game_over = True
-                if len(Player.fire_list) >= 1:
-                    for shot in Player.fire_list:
+
+    def check_events(self):
+        # Pegando colisão de baixo para cima:
+        for shot in Player.fire_list:
+            for lin in range(len(Alien.alien_list) -1, -1, -1):
+                for alien in Alien.alien_list[lin]:
+                    if alien.y >= self.screen.height:
+                        self.game_over = True
+                    if len(Player.fire_list) >= 1:
                         if shot.collided(alien):
+                            if self.new_round >= 1:
+                                self.add_vel += 10
                             Alien.alien_list[lin].remove(alien)
                             Player.fire_list.remove(shot)
                             self.fire_random()
                             if lin == 0: self.score += 300
                             if 1 <= lin <= 2: self.score += 200
                             if lin == 3: self.score += 100
-            
-        if self.player_life == 0 or self.keyboard.key_pressed('g'):
+
+        if self.player_life <= 0 or self.keyboard.key_pressed("g"):
             self.game_over = True
 
     def fire_random(self):
@@ -71,6 +81,15 @@ class Game:
         if self.keyboard.key_pressed("ENTER"):
                 Rank(self, self.player_name, self.score).update_rank()
                 self.leave_game = True
+
+    def show_fps(self):
+        self.tempo += self.screen.delta_time()
+        self.game_loop += 1
+        if self.tempo >= 1:
+            self.last_fps = self.game_loop
+            self.tempo = 0
+            self.game_loop = 0
+        self.screen.draw_text((f"{self.last_fps}"), 300, -10, size=18, color=(205,255,255), font_name="font/Pixeled.ttf")
 
     def reset(self):
         self.player_life = 3
