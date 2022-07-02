@@ -56,7 +56,7 @@ class Alien():
             self.game.new_round += 1
             self.game.add_vel = 0
             Alien.alien_list = [[0 for _ in range(col)] for _ in range(lins)]
-            self.game.difficulty += 0.1
+            self.game.difficulty += 0.25
             self.get_aliens()
 
     def shoot(self):

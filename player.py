@@ -34,11 +34,11 @@ class Player:
             self.spaceship.x += self.vPlayer * self.game.screen.delta_time()
 
         # Define o tempo de recarga
-        if 2 > self.game.difficulty >= 1:
+        if 2.0 > self.game.difficulty >= 1.0:
             self.cooldown = 0.5
-        if 3 > self.game.difficulty >= 2:
+        if 3.0 > self.game.difficulty >= 2.0:
             self.cooldown = 1.0
-        if self.game.difficulty >= 3:
+        if self.game.difficulty >= 3.0:
             self.cooldown = 1.2
         self.ready += self.game.screen.delta_time()
         

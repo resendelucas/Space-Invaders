@@ -18,9 +18,6 @@ class Game:
         self.player_life = 3
         self.tempo, self.game_loop = 0, 0
         self.last_fps = 0
-        self.max_alien_x, self.max_alien_y = 0, 0
-        self.min_alien_x, self.min_alien_y = 0, 0
-        self.colidiu = False
         self.player = Player(self)
         self.alien = Alien(self, self.player)
         self.keyboard = self.screen.get_keyboard()
@@ -44,7 +41,7 @@ class Game:
                     if len(Player.fire_list) >= 1:
                         if shot.collided(alien):
                             if self.new_round >= 1:
-                                self.add_vel += 10
+                                self.add_vel += 5
                             Alien.alien_list[lin].remove(alien)
                             Player.fire_list.remove(shot)
                             self.fire_random()
