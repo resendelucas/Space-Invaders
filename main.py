@@ -3,7 +3,7 @@ from game import Game
 from alien import Alien
 from player import Player
 from rank import Rank
-from PPlayTeste.gameimage import *
+from PPlay.gameimage import *
 
 game = Game()
 player = Player(game)

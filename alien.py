@@ -1,13 +1,15 @@
-from PPlayTeste.gameimage import *
-from PPlayTeste.sound import *
+from PPlay.gameimage import *
+from PPlay.sound import *
 from random import choice, randint
 
 lins = 4
 col = 9
 class Alien():
+
     alien_list = [[0 for _ in range(col)] for _ in range(lins)]
     alien_fire = []
-    
+    boss_index = [0,0]
+    boss_life = 3
     def __init__(self,game,player):
         self.game = game
         self.player = player
@@ -20,6 +22,11 @@ class Alien():
         self.get_aliens()
         
     def get_aliens(self):
+        random_boss_line = randint(0,lins-1)
+        random_boss = randint(0, len(Alien.alien_list[random_boss_line])-1)
+        self.boss_index[0] = random_boss_line
+        self.boss_index[1] = random_boss
+        Alien.alien_list[random_boss_line][random_boss] = 1
         change_y = 50
         for i in range(lins):
             if i == 0: dir = 'green'
@@ -27,36 +34,41 @@ class Alien():
             if i >= 3: dir = 'red'
             change_x = 80
             for j in range(col):
-                self.image = GameImage(f"graphic/{dir}.png")
-                Alien.alien_list[i][j] = self.image
+                alien_image = GameImage(f"graphic/{dir}.png")
+                if Alien.alien_list[i][j] == 1:
+                    alien_image = GameImage(f"graphic/boss.png")
+                Alien.alien_list[i][j] = alien_image
                 Alien.alien_list[i][j].x = change_x 
                 Alien.alien_list[i][j].y = change_y
-                change_x += self.image.width + 10
+                change_x += alien_image.width + 10
             change_y += 50
 
     def check_alien(self):
         for lin in Alien.alien_list:
             for alien in lin:
-                alien.x += (self.vAlien + self.game.add_vel) * self.game.difficulty * self.game.screen.delta_time() * self.direction
+                if alien != 0:
+                    alien.x += (self.vAlien + self.game.add_vel) * self.game.difficulty * self.game.screen.delta_time() * self.direction
 
-                if alien.x >= self.game.screen.width - alien.width:
-                    alien.x = self.game.screen.width - alien.width - 1
-                    self.move_down()
-                    self.direction *= -1
+                    if alien.x >= self.game.screen.width - alien.width:
+                        alien.x = self.game.screen.width - alien.width - 1
+                        self.move_down()
+                        self.direction *= -1
 
-                if alien.x <= 0:
-                    alien.x = 1
-                    self.move_down()
-                    self.direction *= -1
-                    
-                if alien.y >= self.game.screen.height:
-                    self.game.gameover = True
+                    if alien.x <= 0:
+                        alien.x = 1
+                        self.move_down()
+                        self.direction *= -1
+                        
+                    if alien.y >= self.game.screen.height:
+                        self.game.gameover = True
                     
         if Alien.alien_list == [[],[],[],[]]:
             self.game.new_round += 1
             self.game.add_vel = 0
             Alien.alien_list = [[0 for _ in range(col)] for _ in range(lins)]
             self.game.difficulty += 0.25
+            Alien.alien_fire = []
+            Alien.boss_life = 3
             self.get_aliens()
 
     def shoot(self):
@@ -103,5 +115,5 @@ class Alien():
     def reset(self):
         Alien.alien_list = [[0 for _ in range(col)] for _ in range(lins)]
         Alien.alien_fire = []
-        
+        self.boss_life = 3
         Alien(self.game, self.player)

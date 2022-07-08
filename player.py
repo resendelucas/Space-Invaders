@@ -1,7 +1,6 @@
-from PPlayTeste.gameimage import *
-from PPlayTeste.sound import *
-from PPlayTeste.sprite import *
-# from game import Game
+from PPlay.gameimage import *
+from PPlay.sound import *
+from PPlay.sprite import *
 
 class Player:
     fire_list = []
@@ -35,7 +34,7 @@ class Player:
 
         # Define o tempo de recarga
         if 2.0 > self.game.difficulty >= 1.0:
-            self.cooldown = 0.5
+            self.cooldown = 0.3
         if 3.0 > self.game.difficulty >= 2.0:
             self.cooldown = 1.0
         if self.game.difficulty >= 3.0:

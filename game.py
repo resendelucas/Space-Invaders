@@ -1,6 +1,6 @@
-from PPlayTeste.window import *
-from PPlayTeste.gameimage import *
-from PPlayTeste.sound import *
+from PPlay.window import *
+from PPlay.gameimage import *
+from PPlay.sound import *
 from alien import Alien
 from player import Player
 from random import randint
@@ -29,26 +29,50 @@ class Game:
         Sound("sounds/chega.ogg"),Sound("sounds/tapa.ogg"),Sound("sounds/tudo.ogg")]
         for sound in self.sound_list:
             sound.decrease_volume(10)
-
+        self.screen.set_title("Space Invaders")
 
     def check_events(self):
         # Pegando colisão de baixo para cima:
         for shot in Player.fire_list:
             for lin in range(len(Alien.alien_list) -1, -1, -1):
-                for alien in Alien.alien_list[lin]:
+                for col, alien in enumerate(Alien.alien_list[lin]):
                     if alien.y >= self.screen.height:
                         self.game_over = True
                     if len(Player.fire_list) >= 1:
                         if shot.collided(alien):
+                            # verifica se acertou o boss
+                            if lin == Alien.boss_index[0]:
+                                if col != Alien.boss_index[1]:
+                                    if col < Alien.boss_index[1]:
+                                        Alien.boss_index[1] -= 1
+                                    Alien.alien_list[lin].remove(alien)
+                                    if lin == 0: self.score += 300
+                                    if 1 <= lin <= 2: self.score += 200
+                                    if lin == 3: self.score += 100
+
+                                elif col == Alien.boss_index[1]:
+                                    if Alien.boss_life == 1:
+                                        Alien.alien_list[lin].remove(alien)
+                                        self.score += 1000
+                                    else:
+                                        Alien.boss_life -= 1
+                            else:
+                                Alien.alien_list[lin].remove(alien)
+                                if lin == 0: self.score += 300
+                                if 1 <= lin <= 2: self.score += 200
+                                if lin == 3: self.score += 100
                             if self.new_round >= 1:
                                 self.add_vel += 5
-                            Alien.alien_list[lin].remove(alien)
                             Player.fire_list.remove(shot)
                             self.fire_random()
-                            if lin == 0: self.score += 300
-                            if 1 <= lin <= 2: self.score += 200
-                            if lin == 3: self.score += 100
+                            
+                            
 
+
+            for shot_alien in Alien.alien_fire:
+                if shot.collided(shot_alien):
+                    Player.fire_list.remove(shot)
+                    Alien.alien_fire.remove(shot_alien)
         if self.player_life <= 0 or self.keyboard.key_pressed("g"):
             self.game_over = True
 

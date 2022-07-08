@@ -1,5 +1,5 @@
-from PPlayTeste.gameimage import *
-from PPlayTeste.window import *
+from PPlay.gameimage import *
+from PPlay.window import *
 
 class Menu:
     def __init__(self, game, player, alien, rank):
